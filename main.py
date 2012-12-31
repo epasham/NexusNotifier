@@ -7,6 +7,8 @@
 
 import argparse
 from datetime import datetime
+from email.mime.text import MIMEText
+import smtplib
 import urllib2
 
 LOGFILENAME="nexus.log"
@@ -22,11 +24,22 @@ NEXUS_TYPE          = cmdargs.model
 NEXUS_STORAGE_SIZE  = "%dgb" % cmdargs.storage
 
 try:
-    response = urllib2.urlopen("https://play.google.com/store/devices/details?id=nexus_%d_%s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE))
+    gplay_url = "https://play.google.com/store/devices/details?id=nexus_%d_%s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE)
+    response = urllib2.urlopen(gplay_url)
     http = response.read()
 
     if http.find("Add to Cart") >= 0:
         logstring = "%s: FOUND: Add to Cart button detected on Google Play. Nexus %d %s is in stock." % (datetime.now(), NEXUS_TYPE, NEXUS_STORAGE_SIZE)
+
+        # Send mail
+        msg = MIMEText("Nexus %d %s IS IN STOCK! \n\n Get it now! %s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE, gplay_url))
+        msg['Subject'] = "Nexus %d in stock" % NEXUS_TYPE
+        msg['From'] = "bilal@raspberrypi"
+        msg['To'] = "me@itsbilal.com"
+        smtp = smtplib.SMTP("localhost")
+        smtp.sendmail("bilal@raspberrypi", "me@itsbilal.com", msg.as_string())
+        smtp.quit()
+        
     elif http.find("Sold out") >= 0:
         logstring = "%s: Nexus %d %s is out of stock and sold out" % (datetime.now(), NEXUS_TYPE, NEXUS_STORAGE_SIZE)
     else:
