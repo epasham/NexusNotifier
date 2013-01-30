@@ -1,4 +1,4 @@
-All this script does is log whether a specified Nexus device is in stock on Google Play or not.
+All this script does is log and e-mail whether a specified Nexus device is in stock on Google Play or not.
 
 Usage: main.py [-h] [--model [MODEL]] [--storage [STORAGE]] [--email [EMAIL]]
 
