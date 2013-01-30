@@ -17,11 +17,13 @@ LOGFILENAME="nexus.log"
 parser = argparse.ArgumentParser(description="Check stock of a Nexus device on Google Play")
 
 parser.add_argument("--model", type=int, nargs="?", default=4, help="The type of Nexus to search for (Enter 4 for Nexus 4, 7 for Nexus 7, etc)")
-parser.add_argument("--storage", type=int, nargs="?", default=8, help="The storage size of the Nexus device you're searching for (enter 8 for 8GB, 16 for 16GB and so on)")
+parser.add_argument("--storage", type=int, nargs="?", default=8, help="The storage size of the nexus device you're searching for (enter 8 for 8gb, 16 for 16gb and so on)")
+parser.add_argument("--email", type=str, nargs="?", default="", help="The e-mail address to which an e-mail should be sent if the Nexus is in stock")
 
 cmdargs = parser.parse_args()
 NEXUS_TYPE          = cmdargs.model
 NEXUS_STORAGE_SIZE  = "%dgb" % cmdargs.storage
+email_address       = cmdargs.email
 
 try:
     gplay_url = "https://play.google.com/store/devices/details?id=nexus_%d_%s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE)
@@ -31,14 +33,15 @@ try:
     if http.find("Add to Cart") >= 0:
         logstring = "%s: FOUND: Add to Cart button detected on Google Play. Nexus %d %s is in stock." % (datetime.now(), NEXUS_TYPE, NEXUS_STORAGE_SIZE)
 
-        # Send mail
-        msg = MIMEText("Nexus %d %s IS IN STOCK! \n\n Get it now! %s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE, gplay_url))
-        msg['Subject'] = "Nexus %d in stock" % NEXUS_TYPE
-        msg['From'] = "bilal@raspberrypi"
-        msg['To'] = "me@itsbilal.com"
-        smtp = smtplib.SMTP("localhost")
-        smtp.sendmail("bilal@raspberrypi", "me@itsbilal.com", msg.as_string())
-        smtp.quit()
+        if len(email_address) > 0:
+            # Send mail
+            msg = MIMEText("Nexus %d %s IS IN STOCK! \n\n Get it now! %s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE, gplay_url))
+            msg['Subject'] = "Nexus %d in stock" % NEXUS_TYPE
+            msg['From'] = email_address
+            msg['To'] = email_address
+            smtp = smtplib.SMTP("localhost")
+            smtp.sendmail(email_address, email_address, msg.as_string())
+            smtp.quit()
         
     elif http.find("Sold out") >= 0:
         logstring = "%s: Nexus %d %s is out of stock and sold out" % (datetime.now(), NEXUS_TYPE, NEXUS_STORAGE_SIZE)

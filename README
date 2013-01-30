@@ -1,0 +1,12 @@
+All this script does is log whether a specified Nexus device is in stock on Google Play or not.
+
+Usage: main.py [-h] [--model [MODEL]] [--storage [STORAGE]] [--email [EMAIL]]
+
+Example For checking Nexus 4 16GB stock status:
+
+    $ ./main.py --model 4 --storage 16 
+    2013-01-29 20:12:06.337560: FOUND: Add to Cart button detected on Google Play. Nexus 4 16gb is in stock.
+
+If an e-mail address is specified using the --email command line argument, an e-mail containing a link to the Play store page will be sent to the e-mail address specified IF the item is confirmed to be in stock.
+
+Do note that this script checks the item only once per execution; however, you can easily set it up with cron to regularly check for stock status. All checks by the script will be logged under nexus.log in the same folder as the script (or in the home folder of the user if running under cron).
