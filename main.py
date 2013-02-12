@@ -19,14 +19,22 @@ parser = argparse.ArgumentParser(description="Check stock of a Nexus device on G
 parser.add_argument("--model", type=int, nargs="?", default=4, help="The type of Nexus to search for (Enter 4 for Nexus 4, 7 for Nexus 7, etc)")
 parser.add_argument("--storage", type=int, nargs="?", default=8, help="The storage size of the nexus device you're searching for (enter 8 for 8gb, 16 for 16gb and so on)")
 parser.add_argument("--email", type=str, nargs="?", default="", help="The e-mail address to which an e-mail should be sent if the Nexus is in stock")
+parser.add_argument("--wireless-dock", action="store_true", help="Search for stock of the Nexus 4 Wireless charging dock")
 
 cmdargs = parser.parse_args()
 NEXUS_TYPE          = cmdargs.model
 NEXUS_STORAGE_SIZE  = "%dgb" % cmdargs.storage
 email_address       = cmdargs.email
+wireless_dock       = cmdargs.wireless_dock
 
 try:
     gplay_url = "https://play.google.com/store/devices/details?id=nexus_%d_%s" % (NEXUS_TYPE, NEXUS_STORAGE_SIZE)
+
+    if wireless_dock:
+        gplay_url = "https://play.google.com/store/devices/details?id=nexus_4_wireless_charger"
+        NEXUS_TYPE = 4
+        NEXUS_STORAGE_SIZE = "Wireless Charger"
+
     response = urllib2.urlopen(gplay_url)
     http = response.read()
 
